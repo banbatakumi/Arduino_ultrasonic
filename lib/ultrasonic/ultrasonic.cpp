@@ -1,27 +1,37 @@
 #include "ultrasonic.h"
 
-Ultrasonic::Ultrasonic(uint8_t echo_, uint8_t trig_) {
-      echo = echo_;
-      trig = trig_;
+Ultrasonic::Ultrasonic(uint8_t echo_0_, uint8_t trig_0_, uint8_t echo_1_, uint8_t trig_1_,
+                       uint8_t echo_2_, uint8_t trig_2_, uint8_t echo_3_, uint8_t trig_3_) {
+      echo[0] = echo_0_;
+      trig[0] = trig_0_;
+      echo[1] = echo_1_;
+      trig[1] = trig_1_;
+      echo[2] = echo_2_;
+      trig[2] = trig_2_;
+      echo[3] = echo_3_;
+      trig[3] = trig_3_;
 
-      pinMode(echo, INPUT);
-      pinMode(trig, OUTPUT);
+      for (uint8_t i = 0; i < 4; i++) {
+            pinMode(echo[i], INPUT);
+            pinMode(trig[i], OUTPUT);
+      }
 }
 
 void Ultrasonic::Read() {
-      digitalWrite(trig, LOW);
-      delayMicroseconds(5);
-      digitalWrite(trig, HIGH);
-      delayMicroseconds(15);
-      digitalWrite(trig, LOW);
-      duration = pulseIn(echo, HIGH, TIMEOUT);  // 往復にかかった時間が返却される[マイクロ秒]
-      duration = duration / 2;                  // 往路にかかった時間
-      distance = duration * SPEED_OF_SOUND * 100 / 1000000;
-      if (distance > 255) distance = 255;
-
-      rc_distance = rc_distance * RC + distance * (1 - RC);
+      digitalWrite(trig[count], LOW);
+      delayMicroseconds(2);
+      digitalWrite(trig[count], HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trig[count], LOW);
+      duration[count] = pulseIn(echo[count], HIGH, TIMEOUT);  // 往復にかかった時間が返却される[マイクロ秒]
+      duration[count] = duration[count] / 2;                  // 往路にかかった時間
+      distance[count] = duration[count] * SPEED_OF_SOUND * 100 / 1000000;
+      if (distance[count] > 255) distance[count] = 255;
+      rc_distance[count] = rc_distance[count] * RC + distance[count] * (1 - RC);
+      count++;
+      if (count > 3) count = 0;
 }
 
-uint8_t Ultrasonic::GetVal() {
-      return rc_distance;
+uint8_t Ultrasonic::GetVal(uint8_t sensor_num_) {
+      return rc_distance[sensor_num_];
 }
