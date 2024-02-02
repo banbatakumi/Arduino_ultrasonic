@@ -27,6 +27,7 @@ void Ultrasonic::Read() {
       duration[count] = duration[count] / 2;                  // 往路にかかった時間
       distance[count] = duration[count] * SPEED_OF_SOUND * 100 / 1000000;
       if (distance[count] > 255) distance[count] = 255;
+      if (distance[count] <= 2) distance[count] = 255;
       rc_distance[count] = rc_distance[count] * RC + distance[count] * (1 - RC);
       count++;
       if (count > 3) count = 0;

@@ -1,5 +1,5 @@
-#ifndef MBED_ULTRASONIC_H
-#define MBED_ULTRASONIC_H
+#ifndef ULTRASONIC_H
+#define ULTRASONIC_H
 
 #include "Arduino.h"
 
