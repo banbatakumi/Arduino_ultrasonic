@@ -3,7 +3,6 @@
 
 #include "Arduino.h"
 
-#define RC 0.5
 #define SPEED_OF_SOUND 340
 #define TIMEOUT 100000
 
@@ -19,7 +18,6 @@ class Ultrasonic {
 
       float duration[4];
       uint16_t distance[4];
-      uint8_t rc_distance[4];
       uint8_t count;
 };
 

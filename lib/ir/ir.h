@@ -5,9 +5,9 @@
 #include "moving_ave.h"
 
 #define IR_QTY 4
-#define READ_NUM_OF_TIME 1000
-#define DIR_MOVING_AVE_NUM 10
-#define DIS_MOVING_AVE_NUM 25
+#define READ_NUM_OF_TIME 500
+#define DIR_MOVING_AVE_NUM 3
+#define DIS_MOVING_AVE_NUM 3
 
 class Ir {
      public:

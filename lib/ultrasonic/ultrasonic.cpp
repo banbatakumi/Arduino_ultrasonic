@@ -27,12 +27,11 @@ void Ultrasonic::Read() {
       duration[count] = duration[count] / 2;                  // 往路にかかった時間
       distance[count] = duration[count] * SPEED_OF_SOUND * 100 / 1000000;
       if (distance[count] > 255) distance[count] = 255;
-      if (distance[count] <= 2) distance[count] = 255;
-      rc_distance[count] = rc_distance[count] * RC + distance[count] * (1 - RC);
+      if (distance[count] == 0) distance[count] = 255;
       count++;
       if (count > 3) count = 0;
 }
 
 uint8_t Ultrasonic::GetVal(uint8_t sensor_num_) {
-      return rc_distance[sensor_num_];
+      return distance[sensor_num_];
 }

@@ -20,17 +20,10 @@ void timerFire() {
             high = 1 - high;
             if (count < 16) {
                   if (high == 1) {
-                        if (ir.GetDis() == 0) {
-                              PORTD |= 0b00000100;  // 0
-                              PORTD |= 0b00001000;  // 1
-                              PORTB |= 0b00000010;  // 2
-                              PORTD |= 0b00100000;  // 3
-                        } else {
-                              if (abs(ir.GetDir()) <= 90) PORTD |= 0b00000100;  // 0
-                              if (ir.GetDir() >= 0) PORTD |= 0b00001000;        // 1
-                              if (abs(ir.GetDir()) >= 90) PORTB |= 0b00000010;  // 2
-                              if (ir.GetDir() <= 0) PORTD |= 0b00100000;        // 3
-                        }
+                        PORTD |= 0b00000100;  // 0
+                        PORTD |= 0b00001000;  // 1
+                        PORTB |= 0b00000010;  // 2
+                        PORTD |= 0b00100000;  // 3
                   } else {
                         PORTD &= ~0b00000100;  // 0
                         PORTD &= ~0b00001000;  // 1
@@ -57,36 +50,39 @@ void setup() {
 }
 
 void loop() {  // モード指定
-      dis.Read();
-      ir.Read();
+      while (1) {
+            dis.Read();
+            ir.Read();
 
-      // UART送信
-      uint8_t send_byte_num = 8;
-      uint8_t send_byte[send_byte_num];
-      send_byte[0] = 0xFF;
-      send_byte[1] = dis.GetVal(0);
-      send_byte[2] = dis.GetVal(1);
-      send_byte[3] = dis.GetVal(2);
-      send_byte[4] = dis.GetVal(3);
-      send_byte[5] = ir.GetDir() / 2 + 90;
-      send_byte[6] = ir.GetDis();
-      send_byte[7] = 0xAA;
-      for (uint8_t i = 0; i < send_byte_num; i++) {
-            Serial.write(send_byte[i]);
+            // UART送信
+            uint8_t send_byte_num = 8;
+            uint8_t send_byte[send_byte_num];
+            send_byte[0] = 0xFF;
+            send_byte[1] = dis.GetVal(0);
+            send_byte[2] = dis.GetVal(1);
+            send_byte[3] = dis.GetVal(2);
+            send_byte[4] = dis.GetVal(3);
+            send_byte[5] = ir.GetDir() / 2 + 90;
+            send_byte[6] = ir.GetDis();
+            send_byte[7] = 0xAA;
+            for (uint8_t i = 0; i < send_byte_num; i++) {
+                  Serial.write(send_byte[i]);
+            }
+
+            uint8_t read_byte;
+            if ((read_byte = Serial.read()) != -1) do_ir_led_on = read_byte;
+
+            /*
+            Serial.print(dis.GetVal(0));
+            Serial.print(" cm, ");
+            Serial.print(dis.GetVal(1));
+            Serial.print(" cm, ");
+            Serial.print(dis.GetVal(2));
+            Serial.print(" cm, ");
+            Serial.print(dis.GetVal(3));
+            Serial.print(" cm, ");
+            Serial.print(ir.GetDir());
+            Serial.print(", ");
+            Serial.println(ir.GetDis());*/
       }
-
-      if (Serial.available() > 0) do_ir_led_on = Serial.read();
-
-      /*
-      Serial.print(dis.GetVal(0));
-      Serial.print(" cm, ");
-      Serial.print(dis.GetVal(1));
-      Serial.print(" cm, ");
-      Serial.print(dis.GetVal(2));
-      Serial.print(" cm, ");
-      Serial.print(dis.GetVal(3));
-      Serial.print(" cm, ");
-      Serial.print(ir.GetDir());
-      Serial.print(", ");
-      Serial.println(ir.GetDis());*/
 }
