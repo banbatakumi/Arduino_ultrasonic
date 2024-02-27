@@ -2,6 +2,7 @@
 #define ULTRASONIC_H
 
 #include "Arduino.h"
+#include "fast_digitalwrite.h"
 
 #define SPEED_OF_SOUND 340
 #define TIMEOUT 100000

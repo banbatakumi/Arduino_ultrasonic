@@ -2,6 +2,7 @@
 #include <avr/io.h>
 
 #include "TimerOne.h"
+#include "fast_digitalwrite.h"
 #include "ir.h"
 #include "ultrasonic.h"
 
@@ -11,33 +12,29 @@ Ir ir(8, 13, 11, 4);
 const uint8_t ir_led[4] = {2, 3, 9, 5};
 
 uint8_t count;
-bool high;
-bool do_ir_led_on;
+bool on_ir_led[4];
 
 void timerFire() {
-      if (do_ir_led_on == 1) {
-            count++;
-            high = 1 - high;
-            if (count < 16) {
-                  if (high == 1) {
-                        PORTD |= 0b00000100;  // 0
-                        PORTD |= 0b00001000;  // 1
-                        PORTB |= 0b00000010;  // 2
-                        PORTD |= 0b00100000;  // 3
-                  } else {
-                        PORTD &= ~0b00000100;  // 0
-                        PORTD &= ~0b00001000;  // 1
-                        PORTB &= ~0b00000010;  // 2
-                        PORTD &= ~0b00100000;  // 3
-                  }
+      count++;
+      if (count < 16) {
+            if (count % 2 == 0) {
+                  if (on_ir_led[0]) High(ir_led[0]);
+                  if (on_ir_led[1]) High(ir_led[1]);
+                  if (on_ir_led[2]) High(ir_led[2]);
+                  if (on_ir_led[3]) High(ir_led[3]);
             } else {
-                  PORTD &= ~0b00000100;  // 0
-                  PORTD &= ~0b00001000;  // 1
-                  PORTB &= ~0b00000010;  // 2
-                  PORTD &= ~0b00100000;  // 3
+                  if (on_ir_led[0]) Low(ir_led[0]);
+                  if (on_ir_led[1]) Low(ir_led[1]);
+                  if (on_ir_led[2]) Low(ir_led[2]);
+                  if (on_ir_led[3]) Low(ir_led[3]);
             }
-            if (count > 54) count = 0;
+      } else if (count == 16) {
+            Low(ir_led[0]);
+            Low(ir_led[1]);
+            Low(ir_led[2]);
+            Low(ir_led[3]);
       }
+      if (count > 54) count = 0;
 }
 
 void setup() {
@@ -45,7 +42,7 @@ void setup() {
       for (uint8_t i = 0; i < 4; i++) {
             pinMode(ir_led[i], OUTPUT);
       }
-      Timer1.initialize(12);  // マイクロ秒単位で設定
+      Timer1.initialize(13);  // マイクロ秒単位で設定
       Timer1.attachInterrupt(timerFire);
 }
 
@@ -55,7 +52,7 @@ void loop() {  // モード指定
             ir.Read();
 
             // UART送信
-            uint8_t send_byte_num = 8;
+            const uint8_t send_byte_num = 8;
             uint8_t send_byte[send_byte_num];
             send_byte[0] = 0xFF;
             send_byte[1] = dis.GetVal(0);
@@ -65,12 +62,15 @@ void loop() {  // モード指定
             send_byte[5] = ir.GetDir() / 2 + 90;
             send_byte[6] = ir.GetDis();
             send_byte[7] = 0xAA;
-            for (uint8_t i = 0; i < send_byte_num; i++) {
-                  Serial.write(send_byte[i]);
-            }
+            Serial.write(send_byte, send_byte_num);
 
             uint8_t read_byte;
-            if ((read_byte = Serial.read()) != -1) do_ir_led_on = read_byte;
+            if ((read_byte = Serial.read()) != -1) {
+                  on_ir_led[0] = read_byte & 1;
+                  on_ir_led[1] = (read_byte >> 1) & 1;
+                  on_ir_led[2] = (read_byte >> 2) & 1;
+                  on_ir_led[3] = (read_byte >> 3) & 1;
+            }
 
             /*
             Serial.print(dis.GetVal(0));

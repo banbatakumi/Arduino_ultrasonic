@@ -6,8 +6,8 @@
 
 #define IR_QTY 4
 #define READ_NUM_OF_TIME 500
-#define DIR_MOVING_AVE_NUM 3
-#define DIS_MOVING_AVE_NUM 3
+#define DIR_MOVING_AVE_NUM 2
+#define DIS_MOVING_AVE_NUM 5
 
 class Ir {
      public:

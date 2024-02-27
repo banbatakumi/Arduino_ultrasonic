@@ -18,11 +18,11 @@ Ultrasonic::Ultrasonic(uint8_t echo_0_, uint8_t trig_0_, uint8_t echo_1_, uint8_
 }
 
 void Ultrasonic::Read() {
-      digitalWrite(trig[count], LOW);
+      Low(trig[count]);
       delayMicroseconds(2);
-      digitalWrite(trig[count], HIGH);
+      High(trig[count]);
       delayMicroseconds(10);
-      digitalWrite(trig[count], LOW);
+      Low(trig[count]);
       duration[count] = pulseIn(echo[count], HIGH, TIMEOUT);  // 往復にかかった時間が返却される[マイクロ秒]
       duration[count] = duration[count] / 2;                  // 往路にかかった時間
       distance[count] = duration[count] * SPEED_OF_SOUND * 100 / 1000000;
