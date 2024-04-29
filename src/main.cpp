@@ -38,7 +38,7 @@ void timerFire() {
 }
 
 void setup() {
-      Serial.begin(115200);
+      Serial.begin(57600);
       for (uint8_t i = 0; i < 4; i++) {
             pinMode(ir_led[i], OUTPUT);
       }
